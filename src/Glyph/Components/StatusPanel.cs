@@ -74,20 +74,25 @@ public class StatusPanel : View
 	/// <summary>
 	/// Sets a key-value pair. Adds if key doesn't exist, updates if it does.
 	/// </summary>
-	/// <param name="Key">The key name.</param>
+	/// <param name="Key">The key name. Cannot be null or empty.</param>
 	/// <param name="Value">The value to display.</param>
+	/// <exception cref="ArgumentException">Thrown when key is null or empty.</exception>
 	public void Set(string Key, string Value)
 	{
+		if (string.IsNullOrEmpty(Key))
+		{
+			throw new ArgumentException("Key cannot be null or empty.", nameof(Key));
+		}
+
 		lock (_Lock)
 		{
 			if (!_Values.ContainsKey(Key))
 			{
 				_KeyOrder.Add(Key);
 			}
-			_Values[Key] = Value;
+			_Values[Key] = Value ?? string.Empty;
+			SetNeedsDraw();
 		}
-
-		SetNeedsDraw();
 	}
 
 	/// <summary>
@@ -97,22 +102,21 @@ public class StatusPanel : View
 	/// <returns>True if the key was found and removed.</returns>
 	public bool Remove(string Key)
 	{
-		bool Removed;
+		if (string.IsNullOrEmpty(Key))
+		{
+			return false;
+		}
+
 		lock (_Lock)
 		{
-			Removed = _Values.Remove(Key);
+			bool Removed = _Values.Remove(Key);
 			if (Removed)
 			{
 				_KeyOrder.Remove(Key);
+				SetNeedsDraw();
 			}
+			return Removed;
 		}
-
-		if (Removed)
-		{
-			SetNeedsDraw();
-		}
-
-		return Removed;
 	}
 
 	/// <summary>
@@ -150,9 +154,8 @@ public class StatusPanel : View
 		{
 			_KeyOrder.Clear();
 			_Values.Clear();
+			SetNeedsDraw();
 		}
-
-		SetNeedsDraw();
 	}
 
 	public override void Draw(Screen Screen)

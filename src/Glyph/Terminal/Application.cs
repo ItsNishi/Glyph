@@ -9,8 +9,8 @@ public static class Application
 	private static View? _RootView;
 	private static View? _FocusedView;
 	private static Screen? _Screen;
-	private static bool _Running;
-	private static bool _Initialized;
+	private static volatile bool _Running;
+	private static volatile bool _Initialized;
 	private static int _LastWidth;
 	private static int _LastHeight;
 

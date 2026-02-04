@@ -403,9 +403,13 @@ public static class AnsiCodes
 				SetConsoleMode(handle, mode);
 			}
 		}
-		catch
+		catch (EntryPointNotFoundException)
 		{
-			// Fallback: Virtual terminal might already be enabled or not supported
+			// P/Invoke entry point not found - running on non-Windows or unsupported platform
+		}
+		catch (System.ComponentModel.Win32Exception)
+		{
+			// Windows API call failed - virtual terminal might already be enabled or not supported
 		}
 	}
 

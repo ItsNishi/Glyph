@@ -20,6 +20,17 @@ public class OutputView : View
 	private bool _AutoScroll = true;
 	private List<string>? _WrappedLinesCache;
 	private int _LastWidth = -1;
+	private int _MaxLines;
+
+	/// <summary>
+	/// Maximum number of lines to retain. When exceeded, oldest lines are removed.
+	/// Set to 0 for unlimited (default).
+	/// </summary>
+	public int MaxLines
+	{
+		get => _MaxLines;
+		set => _MaxLines = Math.Max(0, value);
+	}
 
 	/// <summary>
 	/// Custom formatter for output lines. If null, uses default formatting.
@@ -98,6 +109,7 @@ public class OutputView : View
 		lock (_LinesLock)
 		{
 			_Lines.Add(new OutputLine(Text, Category, DateTime.Now));
+			EvictOldLines();
 			InvalidateWrappedCache();
 		}
 
@@ -107,6 +119,19 @@ public class OutputView : View
 		}
 
 		SetNeedsDraw();
+	}
+
+	/// <summary>
+	/// Removes oldest lines if MaxLines is exceeded.
+	/// Must be called within _LinesLock.
+	/// </summary>
+	private void EvictOldLines()
+	{
+		if (_MaxLines > 0 && _Lines.Count > _MaxLines)
+		{
+			int To_Remove = _Lines.Count - _MaxLines;
+			_Lines.RemoveRange(0, To_Remove);
+		}
 	}
 
 	/// <summary>

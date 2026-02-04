@@ -64,8 +64,9 @@ public class MockStreamSource : IStreamSource
 	private string GetNextResponse(string Prompt)
 	{
 		// Simple response selection - cycles through available responses
-		var response = _Responses[_ResponseIndex % _Responses.Length];
-		_ResponseIndex++;
+		// Use Interlocked for thread safety in case of concurrent calls
+		int index = Interlocked.Increment(ref _ResponseIndex) - 1;
+		var response = _Responses[index % _Responses.Length];
 
 		// If response contains {prompt}, replace it
 		if (response.Contains("{prompt}"))
