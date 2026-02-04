@@ -10,15 +10,7 @@
 
 > 🎯 Build beautiful terminal interfaces without any external dependencies
 
-```
-┌─ Glyph Console ──────────────────┬─ Status ───┐
-│ [*] Welcome to Glyph             │ Mode : Run │
-│ [+] Scan complete                │ Time : 42s │
-│ [-] Connection timeout           │            │
-├──────────────────────────────────┴────────────┤
-│ > _                                           │
-└───────────────────────────────────────────────┘
-```
+![Glyph Styled Console](assets/styled.png)
 
 ## 🚀 Features
 
@@ -90,6 +82,8 @@ Application.Run(console);
 
 Complete console layout with output, status panel, and command input.
 
+![Console Window](assets/console.png)
+
 **Layout Options:**
 ```csharp
 console.StatusLayout = StatusLayout.Bottom;  // Horizontal row (default)
@@ -117,6 +111,8 @@ var console = new ConsoleWindow
 ### ChatWindow
 
 Chat interface with streaming support for LLM/AI applications.
+
+![Chat Window](assets/chat.png)
 
 ```csharp
 var chat = new ChatWindow { Title = "AI Assistant" };
