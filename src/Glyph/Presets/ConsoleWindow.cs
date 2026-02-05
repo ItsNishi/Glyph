@@ -52,6 +52,8 @@ public class ConsoleWindow : View, IDisposable
 	private int _StatusPanelHeight = 4;
 	private int _StatusPanelWidth = 25;
 	private StatusLayout _StatusLayout = StatusLayout.Bottom;
+	private BoxStyle _BorderStyle = BoxStyle.Single;
+	private TitleAlignment _TitleAlignment = TitleAlignment.Left;
 
 	// Color properties
 	private Color _BackgroundColor = Color.Default;
@@ -114,6 +116,32 @@ public class ConsoleWindow : View, IDisposable
 		set
 		{
 			_StatusLayout = value;
+			SetNeedsDraw();
+		}
+	}
+
+	/// <summary>
+	/// Border style for the window frame (default: Single).
+	/// </summary>
+	public BoxStyle BorderStyle
+	{
+		get => _BorderStyle;
+		set
+		{
+			_BorderStyle = value;
+			SetNeedsDraw();
+		}
+	}
+
+	/// <summary>
+	/// Title alignment within the top border (default: Left).
+	/// </summary>
+	public TitleAlignment TitleAlignment
+	{
+		get => _TitleAlignment;
+		set
+		{
+			_TitleAlignment = value;
 			SetNeedsDraw();
 		}
 	}
@@ -449,7 +477,10 @@ public class ConsoleWindow : View, IDisposable
 		Screen.FillRect(Screen_X, Screen_Y, Width, Height, ' ', _TextColor, _BackgroundColor);
 
 		// Draw outer border
-		Screen.DrawBox(Screen_X, Screen_Y, Width, Height, _BorderColor, _BackgroundColor, BoxStyle.Single);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.DrawBox(Screen_X, Screen_Y, Width, Height, _BorderColor, _BackgroundColor, _BorderStyle);
+		}
 
 		// Draw title in top border
 		if (!string.IsNullOrEmpty(_Title) && Width > 4)
@@ -458,8 +489,14 @@ public class ConsoleWindow : View, IDisposable
 			string Title_Display = _Title.Length > Width - 4 && Max_Title_Length > 0
 				? _Title[..Max_Title_Length] + "..."
 				: _Title;
-			int Title_X = Screen_X + 2;
-			Screen.DrawString(Title_X, Screen_Y, $" {Title_Display} ", _TitleColor, _BackgroundColor, TextAttribute.Bold);
+			string Title_Text = $" {Title_Display} ";
+			int Title_X = _TitleAlignment switch
+			{
+				TitleAlignment.Center => Screen_X + (Width - Title_Text.Length) / 2,
+				TitleAlignment.Right => Screen_X + Width - Title_Text.Length - 2,
+				_ => Screen_X + 2
+			};
+			Screen.DrawString(Title_X, Screen_Y, Title_Text, _TitleColor, _BackgroundColor, TextAttribute.Bold);
 		}
 
 		switch (_StatusLayout)
@@ -481,20 +518,29 @@ public class ConsoleWindow : View, IDisposable
 
 	private void DrawBottomLayout(Screen Screen, int Screen_X, int Screen_Y)
 	{
+		var (H, _, _, _, _, _, VR, VL, _, _, _) = Terminal.Screen.GetBoxChars(
+			_BorderStyle == BoxStyle.None ? BoxStyle.Single : _BorderStyle);
+
 		// Draw status panel separator
 		int Status_Y = Screen_Y + 1 + _OutputView.Height;
-		Screen.SetCell(Screen_X, Status_Y, BoxChars.VerticalRight, _BorderColor);
-		Screen.DrawHLine(Screen_X + 1, Status_Y, Width - 2, BoxChars.Horizontal, _BorderColor);
-		Screen.SetCell(Screen_X + Width - 1, Status_Y, BoxChars.VerticalLeft, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Status_Y, VR, _BorderColor);
+			Screen.SetCell(Screen_X + Width - 1, Status_Y, VL, _BorderColor);
+		}
+		Screen.DrawHLine(Screen_X + 1, Status_Y, Width - 2, H, _BorderColor);
 
 		// Draw status label
 		Screen.DrawString(Screen_X + 2, Status_Y, " Status ", _SeparatorLabelColor, _BackgroundColor);
 
 		// Draw input separator
 		int Input_Y = Status_Y + _StatusPanelHeight;
-		Screen.SetCell(Screen_X, Input_Y, BoxChars.VerticalRight, _BorderColor);
-		Screen.DrawHLine(Screen_X + 1, Input_Y, Width - 2, BoxChars.Horizontal, _BorderColor);
-		Screen.SetCell(Screen_X + Width - 1, Input_Y, BoxChars.VerticalLeft, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Input_Y, VR, _BorderColor);
+			Screen.SetCell(Screen_X + Width - 1, Input_Y, VL, _BorderColor);
+		}
+		Screen.DrawHLine(Screen_X + 1, Input_Y, Width - 2, H, _BorderColor);
 
 		// Draw input label
 		Screen.DrawString(Screen_X + 2, Input_Y, " Command ", Color.Green, _BackgroundColor);
@@ -502,21 +548,33 @@ public class ConsoleWindow : View, IDisposable
 
 	private void DrawLeftLayout(Screen Screen, int Screen_X, int Screen_Y)
 	{
+		var (H, V, _, _, _, _, VR, VL, HD, HU, _) = Terminal.Screen.GetBoxChars(
+			_BorderStyle == BoxStyle.None ? BoxStyle.Single : _BorderStyle);
+
 		int Separator_X = Screen_X + _StatusPanel.Width + 1;
 
 		// Draw vertical separator between status and output
-		Screen.SetCell(Separator_X, Screen_Y, BoxChars.HorizontalDown, _BorderColor);
-		Screen.DrawVLine(Separator_X, Screen_Y + 1, Height - 4, BoxChars.Vertical, _BorderColor);
-		Screen.SetCell(Separator_X, Screen_Y + Height - 3, BoxChars.HorizontalUp, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Separator_X, Screen_Y, HD, _BorderColor);
+			Screen.SetCell(Separator_X, Screen_Y + Height - 3, HU, _BorderColor);
+		}
+		Screen.DrawVLine(Separator_X, Screen_Y + 1, Height - 4, V, _BorderColor);
 
 		// Draw horizontal separator above input
 		int Input_Sep_Y = Screen_Y + Height - 3;
-		Screen.SetCell(Screen_X, Input_Sep_Y, BoxChars.VerticalRight, _BorderColor);
-		Screen.DrawHLine(Screen_X + 1, Input_Sep_Y, Width - 2, BoxChars.Horizontal, _BorderColor);
-		Screen.SetCell(Screen_X + Width - 1, Input_Sep_Y, BoxChars.VerticalLeft, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Input_Sep_Y, VR, _BorderColor);
+			Screen.SetCell(Screen_X + Width - 1, Input_Sep_Y, VL, _BorderColor);
+		}
+		Screen.DrawHLine(Screen_X + 1, Input_Sep_Y, Width - 2, H, _BorderColor);
 
 		// Fix the intersection point
-		Screen.SetCell(Separator_X, Input_Sep_Y, BoxChars.HorizontalUp, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Separator_X, Input_Sep_Y, HU, _BorderColor);
+		}
 
 		// Draw labels
 		Screen.DrawString(Screen_X + 2, Screen_Y, " Status ", _SeparatorLabelColor, _BackgroundColor);
@@ -525,21 +583,33 @@ public class ConsoleWindow : View, IDisposable
 
 	private void DrawRightLayout(Screen Screen, int Screen_X, int Screen_Y)
 	{
+		var (H, V, _, _, _, _, VR, VL, HD, HU, _) = Terminal.Screen.GetBoxChars(
+			_BorderStyle == BoxStyle.None ? BoxStyle.Single : _BorderStyle);
+
 		int Separator_X = Screen_X + _OutputView.Width + 1;
 
 		// Draw vertical separator between output and status
-		Screen.SetCell(Separator_X, Screen_Y, BoxChars.HorizontalDown, _BorderColor);
-		Screen.DrawVLine(Separator_X, Screen_Y + 1, Height - 4, BoxChars.Vertical, _BorderColor);
-		Screen.SetCell(Separator_X, Screen_Y + Height - 3, BoxChars.HorizontalUp, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Separator_X, Screen_Y, HD, _BorderColor);
+			Screen.SetCell(Separator_X, Screen_Y + Height - 3, HU, _BorderColor);
+		}
+		Screen.DrawVLine(Separator_X, Screen_Y + 1, Height - 4, V, _BorderColor);
 
 		// Draw horizontal separator above input
 		int Input_Sep_Y = Screen_Y + Height - 3;
-		Screen.SetCell(Screen_X, Input_Sep_Y, BoxChars.VerticalRight, _BorderColor);
-		Screen.DrawHLine(Screen_X + 1, Input_Sep_Y, Width - 2, BoxChars.Horizontal, _BorderColor);
-		Screen.SetCell(Screen_X + Width - 1, Input_Sep_Y, BoxChars.VerticalLeft, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Input_Sep_Y, VR, _BorderColor);
+			Screen.SetCell(Screen_X + Width - 1, Input_Sep_Y, VL, _BorderColor);
+		}
+		Screen.DrawHLine(Screen_X + 1, Input_Sep_Y, Width - 2, H, _BorderColor);
 
 		// Fix the intersection point
-		Screen.SetCell(Separator_X, Input_Sep_Y, BoxChars.HorizontalUp, _BorderColor);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Separator_X, Input_Sep_Y, HU, _BorderColor);
+		}
 
 		// Draw labels
 		Screen.DrawString(Separator_X + 2, Screen_Y, " Status ", _SeparatorLabelColor, _BackgroundColor);

@@ -31,6 +31,8 @@ public class ChatWindow : View, IDisposable
 	private string _StatusText = "Ready";
 	private bool _IsStreaming;
 	private CancellationTokenSource? _StreamingCts;
+	private BoxStyle _BorderStyle = BoxStyle.Rounded;
+	private TitleAlignment _TitleAlignment = TitleAlignment.Left;
 	private bool _Disposed;
 
 	/// <summary>
@@ -88,6 +90,32 @@ public class ChatWindow : View, IDisposable
 	/// Height of the input area (default 3).
 	/// </summary>
 	public int InputHeight { get; set; } = 3;
+
+	/// <summary>
+	/// Border style for the window frame (default: Rounded).
+	/// </summary>
+	public BoxStyle BorderStyle
+	{
+		get => _BorderStyle;
+		set
+		{
+			_BorderStyle = value;
+			SetNeedsDraw();
+		}
+	}
+
+	/// <summary>
+	/// Title alignment within the top border (default: Left).
+	/// </summary>
+	public TitleAlignment TitleAlignment
+	{
+		get => _TitleAlignment;
+		set
+		{
+			_TitleAlignment = value;
+			SetNeedsDraw();
+		}
+	}
 
 	public ChatWindow()
 	{
@@ -273,7 +301,10 @@ public class ChatWindow : View, IDisposable
 		Screen.FillRect(Screen_X, Screen_Y, Width, Height, ' ', Color.Default, Color.Default);
 
 		// Draw outer border
-		Screen.DrawBox(Screen_X, Screen_Y, Width, Height, Color.BrightBlack, Color.Default, BoxStyle.Rounded);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.DrawBox(Screen_X, Screen_Y, Width, Height, Color.BrightBlack, Color.Default, _BorderStyle);
+		}
 
 		// Draw title in top border
 		if (!string.IsNullOrEmpty(_Title) && Width > 4)
@@ -282,15 +313,27 @@ public class ChatWindow : View, IDisposable
 			string Title_Display = _Title.Length > Width - 4 && Max_Title_Length > 0
 				? _Title[..Max_Title_Length] + "..."
 				: _Title;
-			int Title_X = Screen_X + 2;
-			Screen.DrawString(Title_X, Screen_Y, $" {Title_Display} ", Color.BrightWhite, Color.Default, TextAttribute.Bold);
+			string Title_Text = $" {Title_Display} ";
+			int Title_X = _TitleAlignment switch
+			{
+				TitleAlignment.Center => Screen_X + (Width - Title_Text.Length) / 2,
+				TitleAlignment.Right => Screen_X + Width - Title_Text.Length - 2,
+				_ => Screen_X + 2
+			};
+			Screen.DrawString(Title_X, Screen_Y, Title_Text, Color.BrightWhite, Color.Default, TextAttribute.Bold);
 		}
+
+		var (H, _, _, _, _, _, VR, VL, _, _, _) = Terminal.Screen.GetBoxChars(
+			_BorderStyle == BoxStyle.None ? BoxStyle.Rounded : _BorderStyle);
 
 		// Draw status bar separator
 		int Status_Y = Screen_Y + 1 + _OutputView.Height;
-		Screen.SetCell(Screen_X, Status_Y, BoxChars.VerticalRight, Color.BrightBlack);
-		Screen.DrawHLine(Screen_X + 1, Status_Y, Width - 2, BoxChars.Horizontal, Color.BrightBlack);
-		Screen.SetCell(Screen_X + Width - 1, Status_Y, BoxChars.VerticalLeft, Color.BrightBlack);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Status_Y, VR, Color.BrightBlack);
+			Screen.SetCell(Screen_X + Width - 1, Status_Y, VL, Color.BrightBlack);
+		}
+		Screen.DrawHLine(Screen_X + 1, Status_Y, Width - 2, H, Color.BrightBlack);
 
 		// Draw status text
 		Color Status_Color = _IsStreaming ? Color.Yellow : Color.Green;
@@ -302,9 +345,12 @@ public class ChatWindow : View, IDisposable
 
 		// Draw input separator
 		int Input_Y = Status_Y + 1;
-		Screen.SetCell(Screen_X, Input_Y, BoxChars.VerticalRight, Color.BrightBlack);
-		Screen.DrawHLine(Screen_X + 1, Input_Y, Width - 2, BoxChars.Horizontal, Color.BrightBlack);
-		Screen.SetCell(Screen_X + Width - 1, Input_Y, BoxChars.VerticalLeft, Color.BrightBlack);
+		if (_BorderStyle != BoxStyle.None)
+		{
+			Screen.SetCell(Screen_X, Input_Y, VR, Color.BrightBlack);
+			Screen.SetCell(Screen_X + Width - 1, Input_Y, VL, Color.BrightBlack);
+		}
+		Screen.DrawHLine(Screen_X + 1, Input_Y, Width - 2, H, Color.BrightBlack);
 
 		// Draw input prompt indicator
 		Screen.DrawString(Screen_X + 2, Input_Y, " Input ", Color.Cyan);

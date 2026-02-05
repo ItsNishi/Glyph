@@ -394,6 +394,8 @@ var console = new ConsoleWindow
 | `StatusLayout` | `StatusLayout` | `Bottom` | Status panel position |
 | `StatusPanelHeight` | `int` | `4` | Height when Bottom layout |
 | `StatusPanelWidth` | `int` | `25` | Width when Left/Right layout |
+| `BorderStyle` | `BoxStyle` | `Single` | Border style (Single, Double, Rounded, Ascii, None) |
+| `TitleAlignment` | `TitleAlignment` | `Left` | Title position (Left, Center, Right) |
 | `BackgroundColor` | `Color` | `Default` | Window background |
 | `BorderColor` | `Color` | `BrightBlack` | Border color |
 | `TitleColor` | `Color` | `BrightWhite` | Title text color |
@@ -439,9 +441,11 @@ Application.Run(chat);
 
 #### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `Title` | `string` | Window title |
-| `StatusText` | `string` | Status bar text |
-| `IsStreaming` | `bool` | Whether currently streaming |
-| `InputHeight` | `int` | Height of input area (default 3) |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `Title` | `string` | `""` | Window title |
+| `StatusText` | `string` | `"Ready"` | Status bar text |
+| `IsStreaming` | `bool` | `false` | Whether currently streaming |
+| `InputHeight` | `int` | `3` | Height of input area |
+| `BorderStyle` | `BoxStyle` | `Rounded` | Border style (Single, Double, Rounded, Ascii, None) |
+| `TitleAlignment` | `TitleAlignment` | `Left` | Title position (Left, Center, Right) |

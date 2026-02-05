@@ -230,13 +230,36 @@ public enum BoxStyle
     Single,     // ┌─┐ │ └─┘
     Double,     // ╔═╗ ║ ╚═╝
     Rounded,    // ╭─╮ │ ╰─╯
-    Heavy,      // ┏━┓ ┃ ┗━┛
-    Ascii       // +-+ | +-+
+    Ascii,      // +-+ | +-+
+    None        // No border drawn
 }
 
 // Usage
 Screen.DrawBox(0, 0, 20, 5, Color.White, Color.Default, BoxStyle.Rounded);
 Screen.DrawBox(0, 6, 20, 5, Color.White, Color.Default, BoxStyle.Double);
+```
+
+### Title Alignment
+
+Window presets support configurable title position:
+
+```csharp
+public enum TitleAlignment
+{
+    Left,       // Title near left edge (default)
+    Center,     // Title centered in border
+    Right       // Title near right edge
+}
+```
+
+### Getting Box Characters
+
+Use `Screen.GetBoxChars()` to retrieve the full character set for a style, including junction characters for internal separators:
+
+```csharp
+var (H, V, TL, TR, BL, BR, VR, VL, HD, HU, X) = Screen.GetBoxChars(BoxStyle.Double);
+// H=horizontal, V=vertical, TL/TR/BL/BR=corners
+// VR/VL=vertical+right/left junctions, HD/HU=horizontal+down/up junctions, X=cross
 ```
 
 ## Terminal Compatibility
@@ -325,7 +348,7 @@ root.OnDraw += (s, e) =>
 
 ### ConsoleWindow Theming
 
-The `ConsoleWindow` preset has built-in color properties:
+The `ConsoleWindow` preset has built-in style and color properties:
 
 ```csharp
 using Glyph.Presets;
@@ -333,6 +356,10 @@ using Glyph.Presets;
 var console = new ConsoleWindow
 {
     Title = "Themed Console",
+
+    // Border style and title position
+    BorderStyle = BoxStyle.Double,
+    TitleAlignment = TitleAlignment.Center,
 
     // Background fills the entire window interior
     BackgroundColor = Color.FromRgb(15, 20, 45),

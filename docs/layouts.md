@@ -160,6 +160,18 @@ console.StatusPanelWidth = 20;
 └──────────────────────────────────┘
 ```
 
+#### Border Style & Title Alignment
+
+```csharp
+// Border style: Single (default), Double, Rounded, Ascii, None
+console.BorderStyle = BoxStyle.Double;
+
+// Title alignment: Left (default), Center, Right
+console.TitleAlignment = TitleAlignment.Center;
+```
+
+Internal separators automatically use junction characters matching the chosen border style.
+
 #### Color Theming
 
 Customize all visual elements:
@@ -170,6 +182,8 @@ var console = new ConsoleWindow
     Title = "Themed Console",
     StatusLayout = StatusLayout.Right,
     StatusPanelWidth = 22,
+    BorderStyle = BoxStyle.Double,
+    TitleAlignment = TitleAlignment.Center,
 
     // Custom color scheme
     BackgroundColor = Color.FromRgb(15, 20, 45),
@@ -189,7 +203,9 @@ using Glyph.Presets;
 
 var chat = new ChatWindow
 {
-    Title = "AI Assistant"
+    Title = "AI Assistant",
+    BorderStyle = BoxStyle.Rounded,        // Default: Rounded
+    TitleAlignment = TitleAlignment.Center
 };
 chat.SetupLayout(Console.WindowWidth, Console.WindowHeight);
 

@@ -104,7 +104,18 @@ public enum BoxStyle
 	Single,
 	Double,
 	Rounded,
-	Ascii
+	Ascii,
+	None
+}
+
+/// <summary>
+/// Title alignment options for window presets.
+/// </summary>
+public enum TitleAlignment
+{
+	Left,
+	Center,
+	Right
 }
 
 /// <summary>
@@ -327,52 +338,53 @@ public class Screen : IDisposable
 	}
 
 	/// <summary>
+	/// Returns the full set of box-drawing characters for a given style.
+	/// Tuple order: H, V, TL, TR, BL, BR, VR, VL, HD, HU, X
+	/// </summary>
+	public static (char H, char V, char TL, char TR, char BL, char BR,
+	               char VR, char VL, char HD, char HU, char X) GetBoxChars(BoxStyle Style)
+	{
+		return Style switch
+		{
+			BoxStyle.Double => (
+				BoxChars.DoubleHorizontal, BoxChars.DoubleVertical,
+				BoxChars.DoubleTopLeft, BoxChars.DoubleTopRight,
+				BoxChars.DoubleBottomLeft, BoxChars.DoubleBottomRight,
+				BoxChars.DoubleVerticalRight, BoxChars.DoubleVerticalLeft,
+				BoxChars.DoubleHorizontalDown, BoxChars.DoubleHorizontalUp,
+				BoxChars.DoubleCross),
+			BoxStyle.Rounded => (
+				BoxChars.Horizontal, BoxChars.Vertical,
+				BoxChars.RoundedTopLeft, BoxChars.RoundedTopRight,
+				BoxChars.RoundedBottomLeft, BoxChars.RoundedBottomRight,
+				BoxChars.VerticalRight, BoxChars.VerticalLeft,
+				BoxChars.HorizontalDown, BoxChars.HorizontalUp,
+				BoxChars.Cross),
+			BoxStyle.Ascii => (
+				'-', '|', '+', '+', '+', '+',
+				'+', '+', '+', '+', '+'),
+			_ => (
+				BoxChars.Horizontal, BoxChars.Vertical,
+				BoxChars.TopLeft, BoxChars.TopRight,
+				BoxChars.BottomLeft, BoxChars.BottomRight,
+				BoxChars.VerticalRight, BoxChars.VerticalLeft,
+				BoxChars.HorizontalDown, BoxChars.HorizontalUp,
+				BoxChars.Cross)
+		};
+	}
+
+	/// <summary>
 	/// Draw a box with the specified style.
 	/// </summary>
 	public void DrawBox(int x, int y, int width, int height, Color fg = default, Color bg = default, BoxStyle style = BoxStyle.Single)
 	{
-		if (width < 2 || height < 2)
+		if (width < 2 || height < 2 || style == BoxStyle.None)
 		{
 			return;
 		}
 
-		char horizontal, vertical, topLeft, topRight, bottomLeft, bottomRight;
-
-		switch (style)
-		{
-			case BoxStyle.Double:
-				horizontal = BoxChars.DoubleHorizontal;
-				vertical = BoxChars.DoubleVertical;
-				topLeft = BoxChars.DoubleTopLeft;
-				topRight = BoxChars.DoubleTopRight;
-				bottomLeft = BoxChars.DoubleBottomLeft;
-				bottomRight = BoxChars.DoubleBottomRight;
-				break;
-			case BoxStyle.Rounded:
-				horizontal = BoxChars.Horizontal;
-				vertical = BoxChars.Vertical;
-				topLeft = BoxChars.RoundedTopLeft;
-				topRight = BoxChars.RoundedTopRight;
-				bottomLeft = BoxChars.RoundedBottomLeft;
-				bottomRight = BoxChars.RoundedBottomRight;
-				break;
-			case BoxStyle.Ascii:
-				horizontal = '-';
-				vertical = '|';
-				topLeft = '+';
-				topRight = '+';
-				bottomLeft = '+';
-				bottomRight = '+';
-				break;
-			default: // Single
-				horizontal = BoxChars.Horizontal;
-				vertical = BoxChars.Vertical;
-				topLeft = BoxChars.TopLeft;
-				topRight = BoxChars.TopRight;
-				bottomLeft = BoxChars.BottomLeft;
-				bottomRight = BoxChars.BottomRight;
-				break;
-		}
+		var (horizontal, vertical, topLeft, topRight, bottomLeft, bottomRight,
+		     _, _, _, _, _) = GetBoxChars(style);
 
 		// Corners
 		SetCell(x, y, topLeft, fg, bg);

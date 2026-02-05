@@ -248,6 +248,8 @@ void RunStyledConsoleDemo()
 		Title = "Styled Console Demo",
 		StatusLayout = StatusLayout.Right,
 		StatusPanelWidth = 20,
+		BorderStyle = BoxStyle.Double,
+		TitleAlignment = TitleAlignment.Center,
 
 		// Custom colors - dark blue/purple theme
 		BackgroundColor = Color.FromRgb(15, 20, 45),
@@ -265,12 +267,16 @@ void RunStyledConsoleDemo()
 	// Set up initial status
 	consoleWindow.SetStatus("Theme", "Custom");
 	consoleWindow.SetStatus("Layout", "Right");
+	consoleWindow.SetStatus("Border", "Double");
+	consoleWindow.SetStatus("Title", "Center");
 	consoleWindow.SetStatus("Uptime", "0s");
 
 	// Welcome message
 	consoleWindow.WriteInfo("Welcome to Styled Console Demo");
-	consoleWindow.WriteInfo("Custom colors and right-side status panel");
+	consoleWindow.WriteInfo("Double border, centered title, right-side status panel");
 	consoleWindow.WriteLine(string.Empty);
+	consoleWindow.WriteSuccess("Border Style: Double");
+	consoleWindow.WriteSuccess("Title Alignment: Center");
 	consoleWindow.WriteSuccess("Background: RGB(15, 20, 45) - Dark blue");
 	consoleWindow.WriteSuccess("Border: RGB(100, 140, 200) - Light blue");
 	consoleWindow.WriteSuccess("Title: RGB(255, 220, 100) - Gold");

@@ -119,12 +119,20 @@ console.StatusPanelHeight = 4;   // For Bottom layout
 console.StatusPanelWidth = 25;   // For Left/Right layout
 ```
 
+**Border Style & Title Alignment:**
+```csharp
+console.BorderStyle = BoxStyle.Single;       // Single (default), Double, Rounded, Ascii, None
+console.TitleAlignment = TitleAlignment.Left; // Left (default), Center, Right
+```
+
 **Color Theming:**
 ```csharp
 var console = new ConsoleWindow
 {
     Title = "Themed App",
     StatusLayout = StatusLayout.Right,
+    BorderStyle = BoxStyle.Double,
+    TitleAlignment = TitleAlignment.Center,
     BackgroundColor = Color.FromRgb(15, 20, 45),
     BorderColor = Color.FromRgb(100, 140, 200),
     TitleColor = Color.FromRgb(255, 220, 100),
@@ -140,7 +148,12 @@ Chat interface with streaming support for LLM/AI applications.
 ![Chat Window](assets/chat.png)
 
 ```csharp
-var chat = new ChatWindow { Title = "AI Assistant" };
+var chat = new ChatWindow
+{
+    Title = "AI Assistant",
+    BorderStyle = BoxStyle.Rounded,        // Rounded (default), Single, Double, Ascii, None
+    TitleAlignment = TitleAlignment.Center  // Left (default), Center, Right
+};
 chat.SetupLayout(Console.WindowWidth, Console.WindowHeight);
 
 chat.MessageReceived += async (s, e) =>
@@ -161,7 +174,11 @@ Application.Run(chat);
 
 Dashboard demo combining all components: ImageView, TableView, StatusPanel, OutputView, and ProgressIndicator. All components animate with live data. Supports loading an image file or cycling through built-in test patterns.
 
-![Showcase](assets/showcase.png)
+![Showcase with Image](assets/showcase.png)
+
+![Showcase Rainbow](assets/showcase-rainbow.png)
+
+![Showcase Color Bars](assets/showcase-colorbars.png)
 
 ```bash
 dotnet run --project src/Glyph.Demo -- showcase              # Test patterns only
