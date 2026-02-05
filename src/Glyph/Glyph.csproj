@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Glyph</RootNamespace>
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 
 </Project>

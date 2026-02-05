@@ -504,6 +504,25 @@ public readonly struct Color : IEquatable<Color>
 		return FromRgb(r, g, b);
 	}
 
+	// Public accessors for RGB components
+	public byte R => _r;
+	public byte G => _g;
+	public byte B => _b;
+	public bool IsTrueColor => _mode == ColorMode.TrueColor;
+
+	/// <summary>
+	/// Linear interpolation between two true colors.
+	/// </summary>
+	public static Color Lerp(Color A, Color B, float T)
+	{
+		T = Math.Clamp(T, 0f, 1f);
+		return FromRgb(
+			(byte)(A._r + (B._r - A._r) * T),
+			(byte)(A._g + (B._g - A._g) * T),
+			(byte)(A._b + (B._b - A._b) * T)
+		);
+	}
+
 	/// <summary>Generate ANSI codes for foreground color.</summary>
 	public int[] ToForegroundCodes()
 	{

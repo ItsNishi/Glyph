@@ -63,6 +63,32 @@ var navy = Color.FromHex("#000080");
 var lime = Color.FromHex("32CD32");           // # is optional
 ```
 
+### Color Properties
+
+```csharp
+// RGB component accessors (available on true color values)
+byte r = color.R;
+byte g = color.G;
+byte b = color.B;
+bool isTrueColor = color.IsTrueColor;
+```
+
+### Color Interpolation
+
+```csharp
+// Linear interpolation between two true colors
+// T is clamped to 0.0 - 1.0
+var mid = Color.Lerp(Color.FromRgb(255, 0, 0), Color.FromRgb(0, 0, 255), 0.5f);
+
+// Useful for gradients
+for (int i = 0; i < width; i++)
+{
+    float t = (float)i / (width - 1);
+    var color = Color.Lerp(startColor, endColor, t);
+    Screen.SetCell(x + i, y, ' ', Color.Default, color);
+}
+```
+
 ## Using Colors
 
 ### Drawing Text
@@ -189,6 +215,7 @@ public static class BoxChars
 
     // Block elements
     public const char FullBlock = '█';
+    public const char UpperHalf = '▀';
     public const char LightShade = '░';
     public const char MediumShade = '▒';
     public const char DarkShade = '▓';

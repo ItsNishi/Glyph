@@ -6,10 +6,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Glyph.Demo</RootNamespace>
+		<PublishAot>true</PublishAot>
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<StripSymbols>true</StripSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Glyph\Glyph.csproj" />
 	</ItemGroup>
+
 
 </Project>

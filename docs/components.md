@@ -228,6 +228,89 @@ progress.Reset();
 
 ---
 
+## ImageView
+
+Renders images in the terminal using half-block characters (`▀`). Each terminal cell displays two vertical pixels - foreground color for the top pixel, background color for the bottom - doubling vertical resolution.
+
+```csharp
+var imageView = new ImageView(0, 0, 80, 24);
+
+// Load from file (PNG, BMP, PPM - zero dependencies)
+var pixels = ImageLoader.Load("photo.png");
+imageView.SetPixels(pixels);
+
+// Or use built-in test patterns
+imageView.SetPixels(ImageView.GenerateTestPattern(320, 240));
+imageView.SetPixels(ImageView.GenerateColorBars(320, 240));
+
+// Configure scaling
+imageView.FitMode = ImageFitMode.Fit;
+imageView.UseBilinear = true;
+
+// Clear
+imageView.ClearPixels();
+```
+
+### Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `FitMode` | `ImageFitMode` | `Fit` | How the image scales to the view bounds |
+| `UseBilinear` | `bool` | `false` | Bilinear filtering vs nearest-neighbor |
+| `LetterboxColor` | `Color` | `Color.Black` | Color for letterbox/pillarbox areas |
+| `PixelWidth` | `int` | readonly | Width of the source pixel data |
+| `PixelHeight` | `int` | readonly | Height of the source pixel data |
+
+### Fit Modes
+
+| Mode | Behavior |
+|------|----------|
+| `Fit` | Scale to fit within bounds, preserving aspect ratio (letterboxed) |
+| `Fill` | Scale to fill bounds, preserving aspect ratio (cropped) |
+| `Stretch` | Scale to exactly match bounds, ignoring aspect ratio |
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetPixels(Color[,])` | Set the source pixel data |
+| `ClearPixels()` | Remove pixel data |
+| `GenerateTestPattern(int, int)` | Static: HSV rainbow gradient |
+| `GenerateColorBars(int, int)` | Static: SMPTE-style color bars |
+
+---
+
+## ImageLoader
+
+Zero-dependency image file loader. Supports PNG, BMP, and PPM formats using only .NET runtime APIs (DeflateStream for PNG decompression).
+
+```csharp
+// Load a file (throws on error)
+Color[,] pixels = ImageLoader.Load("photo.png");
+
+// Try loading (returns null on failure)
+Color[,]? pixels = ImageLoader.TryLoad("photo.png");
+```
+
+### Supported Formats
+
+| Format | Details |
+|--------|---------|
+| PNG | Color types 0/2/3/4/6, 8/16-bit, all filter types, non-interlaced |
+| BMP | 24-bit and 32-bit uncompressed (BI_RGB, BI_BITFIELDS) |
+| PPM | P3 (ASCII) and P6 (binary), 8/16-bit |
+
+Format is detected automatically via magic bytes.
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `Load(string)` | Load image file, returns `Color[,]` |
+| `TryLoad(string)` | Load image file, returns `null` on failure |
+
+---
+
 ## Presets
 
 Glyph includes ready-to-use window presets that combine multiple components.

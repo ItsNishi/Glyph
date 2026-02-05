@@ -261,6 +261,20 @@ Application.RemoveTimeout(token);
               └──────────────────────────┘
 ```
 
+## AOT Compilation
+
+Glyph is fully compatible with .NET native ahead-of-time compilation. The core library is marked with `IsAotCompatible` and avoids reflection or dynamic code generation.
+
+```bash
+# Publish as a native binary
+dotnet publish src/Glyph.Demo/ -c Release -r linux-x64
+
+# Run the native binary directly (no .NET runtime needed)
+./src/Glyph.Demo/bin/Release/net10.0/linux-x64/publish/Glyph.Demo showcase
+```
+
+The Demo project is configured with `PublishAot`, `InvariantGlobalization`, and `StripSymbols` for minimal binary size.
+
 ## Performance Considerations
 
 1. **Diff-based rendering** - Only changed cells are written
