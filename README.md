@@ -174,15 +174,11 @@ Application.Run(chat);
 
 Dashboard demo combining all components: ImageView, TableView, StatusPanel, OutputView, and ProgressIndicator. All components animate with live data. Supports loading an image file or cycling through built-in test patterns.
 
-![Showcase with Image](assets/showcase.png)
-
-![Showcase Rainbow](assets/showcase-rainbow.png)
-
-![Showcase Color Bars](assets/showcase-colorbars.png)
+![Showcase](assets/showcase.png)
 
 ```bash
 dotnet run --project src/Glyph.Demo -- showcase              # Test patterns only
-dotnet run --project src/Glyph.Demo -- showcase photo.png     # With image file
+dotnet run --project src/Glyph.Demo -- showcase assets/test_image.png  # With project test image
 ```
 
 ### Image Rendering
